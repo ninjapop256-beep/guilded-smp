@@ -1,0 +1,448 @@
+# =============================================================================
+#  Guilded SMP - configuration
+#
+#  * Apply changes with /guilded reload.
+#  * Runtime data (homes, spawn, mutes, identity pins) lives in
+#    plugins/GuildedSMP/data/ and is never overwritten by edits to this file.
+#  * New settings added by plugin updates are merged in automatically; your
+#    values are kept and a backup (config.yml.bak-<time>) is written first.
+#  * Invalid values are reported in the console and replaced by safe defaults.
+# =============================================================================
+config-version: 1
+
+# -----------------------------------------------------------------------------
+# Operator protection
+# -----------------------------------------------------------------------------
+operator-protection:
+  # Keep the accounts below opped. Set to false (then /guilded reload) when you
+  # legitimately need to de-op one of them.
+  enabled: true
+  # Exact Minecraft usernames. Optionally pin an account with "Name:uuid".
+  # Name-only entries are pinned to the first UUID that joins with that name on
+  # a server that verifies accounts (online-mode or a verified proxy).
+  protected-players:
+    - Itzbreadloaf
+    - FelixSyn
+  # Cancel "/deop <protected name>" from players, console, RCON and command blocks.
+  block-deop-commands: true
+  # How often op status is re-checked (seconds, 5-3600). op is only re-written
+  # when it was actually lost, so this never causes repeated disk writes.
+  check-interval-seconds: 30
+  # DANGEROUS: also op name-only entries on an offline-mode server without a
+  # verified proxy (anyone can join with any name there).
+  allow-offline-mode: false
+  # Give the protected accounts the guilded.creator permission tier.
+  grant-creator-permission: true
+
+# -----------------------------------------------------------------------------
+# Combat tagging
+# -----------------------------------------------------------------------------
+combat:
+  # How long a PvP hit keeps both players in combat (seconds).
+  tag-duration-seconds: 20
+  # ACTION_BAR, BOSS_BAR, BOTH or NONE
+  display: ACTION_BAR
+  # MiniMessage format. <seconds> = remaining seconds.
+  display-format: "<red><bold>⚔ IN COMBAT</bold></red> <dark_gray>—</dark_gray> <white><seconds>s</white>"
+  boss-bar-color: RED
+  notify-on-tag: true
+  notify-on-expire: true
+  # Block teleports caused by commands (e.g. other plugins' /warp, /back, /tp)
+  # for tagged players. This plugin's own /spawn, /home and /tpa are always blocked.
+  block-command-teleports: true
+  # Block nether/end portal use while tagged.
+  block-portals: false
+  # Extra commands (without "/") that tagged players cannot use.
+  blocked-commands:
+    - back
+    - warp
+    - warps
+    - rtp
+    - wild
+    - tpahere
+    - tpaall
+  combat-log:
+    enabled: true
+    # KILL = the player dies when they log out in combat. The server's normal
+    # death rules apply (items drop once, or are kept with keepInventory).
+    # NONE = no penalty.
+    penalty: KILL
+    broadcast: true
+    # Which disconnects count: DISCONNECTED, TIMED_OUT, KICKED, ERRONEOUS_STATE.
+    # Server shutdowns and restarts never count.
+    penalize-reasons:
+      - DISCONNECTED
+      - TIMED_OUT
+
+# -----------------------------------------------------------------------------
+# Teleports (/spawn, /home, /tpa)
+# -----------------------------------------------------------------------------
+teleport:
+  # Seconds to stand still before teleporting (0 = instant).
+  warmup-seconds: 3
+  cancel-on-move: true
+  cancel-on-damage: true
+
+tpa:
+  request-timeout-seconds: 60
+  # Seconds between sending /tpa requests.
+  cooldown-seconds: 30
+
+# -----------------------------------------------------------------------------
+# Homes
+# -----------------------------------------------------------------------------
+homes:
+  default-limit: 3
+  # Higher limits granted by permission guilded.homes.limit.<name>
+  limits:
+    vip: 5
+    mvp: 10
+  # Home names: lowercase letters, digits, _ and -, up to this length.
+  max-name-length: 16
+
+# -----------------------------------------------------------------------------
+# Spawn
+# -----------------------------------------------------------------------------
+spawn:
+  # Send players to spawn on their very first join.
+  teleport-on-first-join: true
+  # Respawn at spawn when a player has no bed or respawn anchor.
+  respawn-at-spawn-without-bed: true
+
+# -----------------------------------------------------------------------------
+# Spawn protection (a square centred on the spawn point)
+# -----------------------------------------------------------------------------
+spawn-protection:
+  # Radius used the first time a spawn is set (radius 100 = 201x201 blocks).
+  default-radius: 100
+  max-radius: 5000
+  # Turn protection on automatically the first time /spawn set is used.
+  enable-on-first-spawn-set: true
+  # No player-vs-player damage, fire, knockback, harmful potions or fishing-rod
+  # pulls when either player is inside.
+  block-pvp: true
+  # Hostile mobs cannot hurt players who are inside.
+  block-hostile-mob-damage: true
+  # Stop hostile mobs spawning inside for these reasons.
+  block-hostile-spawns: true
+  hostile-spawn-reasons:
+    - NATURAL
+    - JOCKEY
+    - REINFORCEMENTS
+    - PATROL
+    - VILLAGE_INVASION
+  # Hostile mobs can't target players who are inside.
+  block-hostile-targeting: true
+  # Remove hostile mobs that wander in, but only ones that would despawn anyway
+  # (no name tag, not leashed, not persistent, not bosses).
+  remove-wandering-hostiles: true
+  hostile-sweep-interval-seconds: 5
+  # Combat-tagged players can't walk, ride, fly or teleport into the zone.
+  # Players already inside can always leave.
+  block-combat-tagged-entry: true
+  # Visible border. Uses display entities: no world blocks are ever changed.
+  outline:
+    enabled: true
+    block: RED_WOOL
+    # Height of the line in blocks (0.0625 - 4).
+    height: 1.0
+    # Always fully lit, so it is visible at night.
+    full-bright: true
+    # Client view-distance multiplier for the line (1.0 = default).
+    view-range: 1.0
+    # Re-check ground height under the line every N seconds (0 = never).
+    refresh-interval-seconds: 60
+    # Hard cap on display entities used by the line.
+    max-entities: 2048
+
+# -----------------------------------------------------------------------------
+# Legendary weapons
+# -----------------------------------------------------------------------------
+legendaries:
+  # Effects only proc on fully charged swings (no spam-click procs).
+  require-full-attack-charge: true
+  # How often held-weapon effects are refreshed (ticks).
+  passive-check-interval-ticks: 10
+  # Length of each refreshed held effect (ticks). Removed when you switch away.
+  passive-effect-duration-ticks: 60
+  # Anvil: repair with netherite ingots / a plain netherite sword.
+  allow-anvil-repair: true
+  # Anvil: apply enchanted books.
+  allow-anvil-enchanted-books: true
+  # Anvil: rename legendaries.
+  allow-rename: false
+  held-particles: true
+  # Broadcast when someone crafts a legendary.
+  announce-crafts: true
+  inferno-blade:
+    ignite-chance: 0.25
+    ignite-seconds: 4
+    fire-resistance-while-held: true
+  frostbite:
+    slowness-chance: 0.30
+    slowness-seconds: 3
+    # 0 = Slowness I, 1 = Slowness II ...
+    slowness-amplifier: 1
+    speed-while-held: true
+    # 0 = Speed I
+    speed-amplifier: 0
+  void-reaper:
+    weakness-chance: 0.25
+    weakness-seconds: 4
+    weakness-amplifier: 0
+    kill-strength-seconds: 8
+    # 0 = Strength I
+    kill-strength-amplifier: 0
+    # PLAYERS = only direct melee kills of players.
+    # PLAYERS_AND_HOSTILES = also hostile mobs.
+    kill-trigger: PLAYERS
+
+# -----------------------------------------------------------------------------
+# Legendary recipes (crafting table, 3x3)
+#   Ingredients: guildedsmp:<ingredient id> or a vanilla item id.
+#   Each letter in the shape uses one item. Mirrored layouts also work.
+# -----------------------------------------------------------------------------
+recipes:
+  enabled: true
+  # Unlock the recipes in every player's recipe book on join.
+  discover-on-join: true
+  inferno-blade:
+    shape: ["CEC", "RSR", "PM "]
+    ingredients:
+      C: guildedsmp:inferno_core
+      E: guildedsmp:ember_crystal
+      R: minecraft:blaze_rod
+      S: minecraft:netherite_sword
+      P: minecraft:blaze_powder
+      M: minecraft:magma_block
+  frostbite:
+    shape: ["FZF", "PSP", "BH "]
+    ingredients:
+      F: guildedsmp:frost_core
+      Z: guildedsmp:frozen_crystal
+      P: minecraft:packed_ice
+      S: minecraft:netherite_sword
+      B: minecraft:blue_ice
+      H: minecraft:prismarine_shard
+  void-reaper:
+    shape: ["VHV", "OSO", "EN "]
+    ingredients:
+      V: guildedsmp:void_shard
+      H: guildedsmp:void_heart
+      O: minecraft:obsidian
+      S: minecraft:netherite_sword
+      E: minecraft:ender_eye
+      N: minecraft:nether_star
+
+# -----------------------------------------------------------------------------
+# Ingredient drops (chance per kill, 0.0 - 1.0)
+# -----------------------------------------------------------------------------
+drops:
+  enabled: true
+  # Only kills credited to a player drop ingredients.
+  require-player-kill: true
+  # Added chance per Looting level on the killer's weapon.
+  looting-bonus-per-level: 0.01
+  # Boss drops go straight into the killer's inventory.
+  boss-drops-to-killer: true
+  table:
+    inferno_core:
+      BLAZE: 0.05
+    ember_crystal:
+      MAGMA_CUBE: 0.03
+      GHAST: 0.10
+    frost_core:
+      STRAY: 0.06
+    frozen_crystal:
+      STRAY: 0.02
+      POLAR_BEAR: 0.08
+    void_shard:
+      ENDERMAN: 0.015
+      SHULKER: 0.08
+    void_heart:
+      ENDER_DRAGON: 1.0
+      WARDEN: 0.25
+
+# -----------------------------------------------------------------------------
+# TAB list. The header brand "GUILDED SMP" is fixed: GUILDED = #00FFFF,
+# SMP = #000000 (exact colours, no gradient).
+# -----------------------------------------------------------------------------
+tablist:
+  enabled: true
+  # How often ping / player counts are refreshed (ticks; 40 = 2 seconds).
+  # Only changed footers are sent.
+  refresh-interval-ticks: 40
+  # Give the black "SMP" a light text shadow so it is readable on the dark TAB
+  # background. The letters themselves stay #000000.
+  smp-shadow: true
+  smp-shadow-color: "#A0A0A0"
+  # Extra MiniMessage lines under the brand, e.g. "<gray>Season 1</gray>".
+  header-extra-lines: []
+  # <ping> (coloured by quality), <online>, <max>
+  footer-format: "<gray>Ping: <ping> <dark_gray>|</dark_gray> Players Online: <white><online>/<max></white></gray>"
+  ping-good-ms: 80
+  ping-okay-ms: 160
+  # If another TAB plugin (TAB, CMI, ...) is installed, leave the TAB list to it.
+  disable-on-conflict: true
+
+# -----------------------------------------------------------------------------
+# Resource pack (optional). Upload GuildedSMP-ResourcePack-<version>.zip
+# somewhere that serves a direct download, then fill in url and sha1.
+# The sha1 is printed by the build and stored next to the ZIP.
+# -----------------------------------------------------------------------------
+resource-pack:
+  enabled: false
+  url: ""
+  sha1: ""
+  # Kick players who decline (vanilla client behaviour when required).
+  required: false
+  prompt: "<#00FFFF>Guilded SMP</#00FFFF> <gray>uses a custom resource pack for legendary items.</gray>"
+  send-delay-ticks: 20
+  # AUTO = custom sounds for players who loaded the pack, vanilla for others.
+  # CUSTOM = always custom, VANILLA = always vanilla.
+  sounds: AUTO
+
+# -----------------------------------------------------------------------------
+# Moderation
+# -----------------------------------------------------------------------------
+moderation:
+  # Commands muted players cannot use (without "/").
+  muted-blocked-commands: [msg, tell, w, whisper, me, say, r, reply, mail, teammsg, tm]
+  # Longest allowed /tempban.
+  max-tempban: "365d"
+
+# -----------------------------------------------------------------------------
+# Messages (MiniMessage: https://docs.papermc.io/adventure/minimessage/format)
+# -----------------------------------------------------------------------------
+messages:
+  prefix: "<dark_gray>[<#00FFFF>Guilded</#00FFFF>]</dark_gray> "
+  general:
+    players-only: "<red>Only players can do that."
+    no-permission: "<red>You don't have permission to do that."
+    player-not-found: "<red>No online player named <white><player></white>."
+    player-unknown: "<red>No player named <white><player></white> has joined this server."
+    bad-duration: "<red>'<input>' is not a valid duration. Use e.g. 30m, 12h, 7d, 1d12h."
+  opprotect:
+    deop-blocked: "<red><player> is a protected operator and can't be de-opped. Disable operator-protection in config.yml first."
+    status: "<gray>Operator protection: <white><state></white>. Account verification: <white><auth></white>."
+    entry: "<gray>- <white><player></white> <dark_gray>(<uuid>)</dark_gray> <aqua><op></aqua>"
+  combat:
+    tagged: "<red>You are in combat! Don't log out for <white><seconds>s</white>."
+    expired: "<green>You are no longer in combat."
+    log-broadcast: "<red><player> logged out during combat and was killed."
+    log-notice: "<red>You logged out during combat, so you were killed."
+    command-blocked: "<red>You can't use that command in combat (<white><seconds>s</white> left)."
+    teleport-blocked: "<red>You can't teleport while in combat (<white><seconds>s</white> left)."
+    cleared: "<green>Cleared the combat tag of <white><player></white>."
+    status-tagged: "<white><player></white> <red>is in combat for <white><seconds>s</white>."
+    status-clear: "<white><player></white> <green>is not in combat."
+  teleport:
+    warmup: "<gray>Teleporting to <white><destination></white> in <white><seconds>s</white>. Don't move."
+    destination-unavailable: "<red><destination> is not available right now."
+    unsafe: "<red><destination> isn't safe to teleport to right now."
+    success: "<green>Teleported to <white><destination></white>."
+    failed: "<red>The teleport to <destination> failed."
+    cancelled-move: "<red>Teleport cancelled because you moved."
+    cancelled-damage: "<red>Teleport cancelled because you took damage."
+    cancelled-combat: "<red>Teleport cancelled: you entered combat."
+  tpa:
+    usage: "<red>Usage: /tpa <player>"
+    sent: "<green>Request sent to <white><player></white>. It expires in <white><seconds>s</white>. <gray>/tpacancel to cancel."
+    received: "<white><player></white> <gray>wants to teleport to you. Expires in <white><seconds>s</white>."
+    button-accept: "<green><bold>[ACCEPT]</bold></green>"
+    button-deny: "<red><bold>[DENY]</bold></red>"
+    self: "<red>You can't send a teleport request to yourself."
+    already-pending: "<red>You already have a pending request to <white><player></white>."
+    pending-other: "<red>You already have a pending request. Use /tpacancel first."
+    cooldown: "<red>Wait <white><seconds>s</white> before sending another request."
+    target-in-combat: "<red><player> is in combat right now."
+    no-request-from: "<red>You have no request from <white><player></white>."
+    no-requests: "<red>You have no pending teleport requests."
+    cancelled: "<gray>Your teleport request was cancelled."
+    nothing-to-cancel: "<red>You have no outgoing teleport request."
+    expired-requester: "<gray>Your teleport request to <white><player></white> expired."
+    expired-target: "<gray>The teleport request from <white><player></white> expired."
+    requester-gone: "<red>That player is no longer online."
+    requester-in-combat: "<red><player> is in combat and can't teleport now."
+    accept-in-combat: "<red>You can't accept teleport requests while in combat."
+    accepted-target: "<green>Accepted <white><player></white>'s request."
+    accepted-requester: "<green><white><player></white> accepted your request."
+    denied-target: "<gray>Denied <white><player></white>'s request."
+    denied-requester: "<red><white><player></white> denied your request."
+    cancelled-target: "<gray><white><player></white> cancelled their teleport request."
+    cancelled-other: "<gray>The teleport request with <white><player></white> was cancelled."
+    cancelled-combat: "<red>Your teleport requests were cancelled because you entered combat."
+  homes:
+    usage-home: "<red>Usage: /home [name]"
+    usage-sethome: "<red>Usage: /sethome [name]"
+    usage-delhome: "<red>Usage: /delhome <name>"
+    none: "<gray>You have no homes yet. Use <white>/sethome</white>."
+    not-found: "<red>You have no home called <white><home></white>. See /homes."
+    world-unavailable: "<red>Home <white><home></white> is in world <white><world></white>, which isn't loaded."
+    invalid-name: "<red>Home names may use a-z, 0-9, _ and - (max <max> characters)."
+    unsafe-here: "<red>You can't set a home here; stand on solid, safe ground."
+    set: "<green>Home <white><home></white> set."
+    updated: "<green>Home <white><home></white> moved here."
+    limit: "<red>You've reached your home limit (<white><limit></white>). Delete one with /delhome."
+    deleted: "<green>Home <white><home></white> deleted."
+    list-header: "<gray>Your homes (<white><count></white>/<white><limit></white>) - click to teleport:"
+  spawn:
+    usage: "<red>Usage: /spawn [set|remove|find]"
+    not-set: "<red>The spawn hasn't been set yet."
+    world-unavailable: "<red>The spawn world <white><world></white> isn't loaded."
+    set: "<green>Spawn set in <white><world></white> at <white><x>, <y>, <z></white>."
+    protection-active: "<gray>Spawn protection is active with radius <white><radius></white>."
+    removed: "<green>Spawn removed. Spawn protection is suspended until a spawn is set again."
+    find: "<gray>Spawn: <white><world></white> at <white><x>, <y>, <z></white>."
+    find-other-world: "<gray>You are in a different world from spawn (<white><world></white>)."
+    find-distance: "<gray>You are <white><distance></white> blocks away."
+  spawnprotect:
+    help: "<gray>/spawnprotect <white><radius></white> - protect a square around spawn<newline><gray>/spawnprotect <white>status</white> - show the current state<newline><gray>/spawnprotect <white>remove</white> - turn protection off"
+    usage: "<red>Usage: /spawnprotect [<radius>|status|remove]"
+    bad-radius: "<red>Radius must be a whole number from 1 to <max>."
+    set: "<green>Spawn protection radius set to <white><radius></white>."
+    waiting-for-spawn: "<yellow>No spawn is set yet. Protection starts once you use /spawn set."
+    disabled: "<green>Spawn protection disabled."
+    already-disabled: "<gray>Spawn protection is already disabled."
+    status-active: "<gray>Spawn protection: <green>ON</green>, radius <white><radius></white> in <white><world></white>.<newline><gray>Centre <white><cx>, <cz></white> · X <white><minx></white> to <white><maxx></white> · Z <white><minz></white> to <white><maxz></white> · outline <white><outline></white>"
+    status-disabled: "<gray>Spawn protection: <red>OFF</red> (last radius <white><radius></white>)."
+    status-no-spawn: "<gray>Spawn protection: <yellow>SUSPENDED</yellow> - no spawn set (radius <white><radius></white>)."
+    status-world-unloaded: "<gray>Spawn protection: <yellow>SUSPENDED</yellow> - world <white><world></white> isn't loaded."
+    pvp-blocked: "<red>PvP is disabled at spawn."
+    tagged-entry-blocked: "<red>You can't enter spawn while in combat (<white><seconds>s</white> left)."
+  recipes:
+    disabled: "<red>That recipe is currently disabled."
+    announce: "<gold><white><player></white> forged the <white><item></white>!"
+  drops:
+    boss-reward: "<light_purple>A legendary ingredient was added to your inventory."
+  mute:
+    usage: "<red>Usage: /mute <player> [duration|perm] [reason]"
+    usage-unmute: "<red>Usage: /unmute <player>"
+    done: "<green>Muted <white><player></white> <time>."
+    undone: "<green>Unmuted <white><player></white>."
+    not-muted: "<red><player> is not muted."
+    notify: "<red>You have been muted <time>. Reason: <white><reason></white>"
+    notify-unmuted: "<green>You can chat again."
+    you-are-muted: "<red>You are muted for <white><time></white>. Reason: <white><reason></white>"
+    you-are-muted-permanent: "<red>You are muted. Reason: <white><reason></white>"
+  moderation:
+    target-protected: "<red><player> is a protected owner account."
+    target-exempt: "<red><player> can't be moderated by you."
+  tempban:
+    usage: "<red>Usage: /tempban <player> <duration> [reason]"
+    usage-unban: "<red>Usage: /unban <player>"
+    too-long: "<red>The longest allowed ban is <max>."
+    done: "<green>Banned <white><player></white> for <white><time></white>."
+    kick: "<red>You are banned for <white><time></white>.<newline><gray>Reason: <white><reason></white>"
+    not-banned: "<red><player> is not banned."
+    undone: "<green>Unbanned <white><player></white>."
+  guilded:
+    help: "<#00FFFF><bold>GUILDED</bold></#00FFFF> <gray>commands:<newline><white>/tpa</white>, <white>/tpaccept</white>, <white>/tpdeny</white>, <white>/tpacancel</white><newline><white>/home</white>, <white>/sethome</white>, <white>/delhome</white>, <white>/homes</white><newline><white>/spawn</white> <gray>[find]</gray>, <white>/spawnprotect status</white><newline><white>/guilded recipes</white> <gray>- legendary weapon recipes</gray><newline><white>/guilded combat</white> <gray>- your combat status</gray>"
+    version: "<gray>Guilded SMP <white><version></white> on <white><server></white>."
+    reloaded: "<green>Configuration reloaded with <white><warnings></white> warning(s)."
+    unknown-subcommand: "<red>Unknown subcommand. Try /guilded help."
+    unknown-item: "<red>Unknown item '<item>'. See /guilded items."
+    items: "<gray>Custom items: <white><items></white>"
+    give-usage: "<red>Usage: /guilded give <player> <item> [amount]"
+    bad-amount: "<red>Amount must be 1-<max>."
+    given: "<green>Gave <white><amount>×</white> <white><item></white> to <white><player></white>."

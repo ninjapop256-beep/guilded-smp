@@ -1,0 +1,175 @@
+name: GuildedSMP
+version: '${version}'
+main: com.guildedsmp.GuildedSMP
+api-version: '26.2'
+load: POSTWORLD
+description: Guilded SMP core - homes, TPA, spawn and spawn protection, combat tagging, legendary weapons, moderation and TAB branding.
+authors: [Guilded SMP]
+
+commands:
+  tpa:
+    description: Ask to teleport to another player.
+    usage: /tpa <player>
+    permission: guilded.tpa
+  tpaccept:
+    description: Accept a teleport request.
+    usage: /tpaccept [player]
+    permission: guilded.tpa
+  tpdeny:
+    description: Deny a teleport request.
+    usage: /tpdeny [player]
+    permission: guilded.tpa
+  tpacancel:
+    description: Cancel your outgoing teleport request.
+    usage: /tpacancel
+    permission: guilded.tpa
+  home:
+    description: Teleport to one of your homes.
+    usage: /home [name]
+    permission: guilded.home
+  sethome:
+    description: Set a home where you stand.
+    usage: /sethome [name]
+    permission: guilded.home
+  delhome:
+    description: Delete one of your homes.
+    usage: /delhome <name>
+    permission: guilded.home
+  homes:
+    description: List your homes.
+    usage: /homes
+    permission: guilded.home
+  spawn:
+    description: Teleport to spawn, or manage it (set, remove, find).
+    usage: /spawn [set|remove|find]
+    permission: guilded.spawn
+  spawnprotect:
+    description: Show or change spawn protection.
+    usage: /spawnprotect [<radius>|status|remove]
+    permission: guilded.spawnprotect.view
+  mute:
+    description: Mute a player, optionally for a time.
+    usage: /mute <player> [duration|perm] [reason]
+    permission: guilded.mute
+  unmute:
+    description: Unmute a player.
+    usage: /unmute <player>
+    permission: guilded.mute
+  tempban:
+    description: Ban a player for a limited time.
+    usage: /tempban <player> <duration> [reason]
+    permission: guilded.tempban
+  unban:
+    description: Lift a ban.
+    usage: /unban <player>
+    permission: guilded.unban
+  guilded:
+    description: Guilded SMP help, recipes and admin tools.
+    usage: /guilded [help|recipes|combat|reload|give|items|opprotect|version]
+    aliases: [gsmp]
+
+permissions:
+  # ---------------------------------------------------------------- tiers
+  guilded.player:
+    description: Everyday player commands.
+    default: true
+    children:
+      guilded.tpa: true
+      guilded.home: true
+      guilded.spawn: true
+      guilded.spawn.find: true
+      guilded.spawnprotect.view: true
+      guilded.recipes: true
+  guilded.moderator:
+    description: Mute and temporary-ban tools.
+    default: op
+    children:
+      guilded.player: true
+      guilded.mute: true
+      guilded.tempban: true
+      guilded.unban: true
+  guilded.admin:
+    description: Server administration (spawn, spawn protection, reload, combat tools).
+    default: op
+    children:
+      guilded.moderator: true
+      guilded.spawn.set: true
+      guilded.spawn.remove: true
+      guilded.spawnprotect.modify: true
+      guilded.reload: true
+      guilded.combat.admin: true
+      guilded.teleport.bypasswarmup: true
+      guilded.tpa.bypasscooldown: true
+      guilded.moderation.exempt: true
+      guilded.opprotect.view: true
+  guilded.creator:
+    description: Owner tier. Includes admin plus granting custom items. Given automatically to the protected owner accounts.
+    default: false
+    children:
+      guilded.admin: true
+      guilded.give: true
+
+  # ---------------------------------------------------------------- individual nodes
+  guilded.tpa:
+    description: Use /tpa, /tpaccept, /tpdeny, /tpacancel.
+    default: false
+  guilded.tpa.bypasscooldown:
+    description: Skip the /tpa cooldown.
+    default: false
+  guilded.home:
+    description: Use /home, /sethome, /delhome, /homes.
+    default: false
+  guilded.homes.unlimited:
+    description: No home limit.
+    default: false
+  guilded.spawn:
+    description: Use /spawn.
+    default: false
+  guilded.spawn.find:
+    description: Use /spawn find.
+    default: false
+  guilded.spawn.set:
+    description: Use /spawn set.
+    default: false
+  guilded.spawn.remove:
+    description: Use /spawn remove.
+    default: false
+  guilded.spawnprotect.view:
+    description: See spawn-protection status.
+    default: false
+  guilded.spawnprotect.modify:
+    description: Change or disable spawn protection.
+    default: false
+  guilded.teleport.bypasswarmup:
+    description: Teleport without the warm-up delay.
+    default: false
+  guilded.combat.bypass:
+    description: EMERGENCY OVERRIDE. Ignore combat-tag teleport and spawn-entry restrictions. Not part of any tier; grant explicitly.
+    default: false
+  guilded.combat.admin:
+    description: View or clear other players' combat tags (/guilded combat clear).
+    default: false
+  guilded.mute:
+    description: Use /mute and /unmute.
+    default: false
+  guilded.tempban:
+    description: Use /tempban.
+    default: false
+  guilded.unban:
+    description: Use /unban.
+    default: false
+  guilded.moderation.exempt:
+    description: Cannot be muted or temp-banned by moderators (only by creators).
+    default: false
+  guilded.recipes:
+    description: Open the legendary recipe viewer.
+    default: false
+  guilded.reload:
+    description: Use /guilded reload.
+    default: false
+  guilded.give:
+    description: Give custom items (/guilded give). Powerful - creator tier only by default.
+    default: false
+  guilded.opprotect.view:
+    description: See operator-protection status.
+    default: false

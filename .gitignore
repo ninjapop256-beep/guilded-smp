@@ -1,0 +1,31 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Packaged deliverables (attached to GitHub Releases instead of committed)
+dist/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+bin/
+out/
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Local test servers / runtime data (never commit server files or secrets)
+run/
+server/
+*.log
+
+# Python caches from asset tools
+__pycache__/
+*.pyc

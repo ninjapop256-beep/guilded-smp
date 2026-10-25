@@ -1,0 +1,42 @@
+{
+  "legendary.inferno.ignite": {
+    "subtitle": "subtitles.guildedsmp.legendary.inferno.ignite",
+    "sounds": [
+      {
+        "name": "guildedsmp:legendary/inferno_ignite"
+      }
+    ]
+  },
+  "legendary.frostbite.chill": {
+    "subtitle": "subtitles.guildedsmp.legendary.frostbite.chill",
+    "sounds": [
+      {
+        "name": "guildedsmp:legendary/frostbite_chill"
+      }
+    ]
+  },
+  "legendary.void.drain": {
+    "subtitle": "subtitles.guildedsmp.legendary.void.drain",
+    "sounds": [
+      {
+        "name": "guildedsmp:legendary/void_drain"
+      }
+    ]
+  },
+  "legendary.void.reap": {
+    "subtitle": "subtitles.guildedsmp.legendary.void.reap",
+    "sounds": [
+      {
+        "name": "guildedsmp:legendary/void_reap"
+      }
+    ]
+  },
+  "legendary.forge": {
+    "subtitle": "subtitles.guildedsmp.legendary.forge",
+    "sounds": [
+      {
+        "name": "guildedsmp:legendary/forge"
+      }
+    ]
+  }
+}

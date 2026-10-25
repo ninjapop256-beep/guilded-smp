@@ -1,0 +1,29 @@
+{
+  "pack": {
+    "description": [
+      {
+        "text": "GUILDED",
+        "color": "#00FFFF",
+        "bold": true
+      },
+      {
+        "text": " "
+      },
+      {
+        "text": "SMP",
+        "color": "#000000",
+        "bold": true,
+        "shadow_color": -6250336
+      },
+      {
+        "text": "\nLegendary weapons & ingredients",
+        "color": "gray"
+      }
+    ],
+    "min_format": [
+      88,
+      0
+    ],
+    "max_format": 88
+  }
+}
