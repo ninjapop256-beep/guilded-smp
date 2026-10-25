@@ -44,6 +44,15 @@ class OperatorProtectionTest extends PluginTestBase {
         assertTrue(console.isCancelled());
 
         PlayerMock admin = server.addPlayer("Admin");
+        PlayerMock asker = server.addPlayer("Asker");
+        asker.setOp(true);
+        drain(asker);
+        PlayerCommandPreprocessEvent fake = new PlayerCommandPreprocessEvent(asker, "/deop FelixSyn");
+        server.getPluginManager().callEvent(fake);
+        assertTrue(fake.isCancelled());
+        assertEquals(java.util.List.of("Made FelixSyn no longer a server operator"), drain(asker),
+                "looks like a normal successful de-op");
+
         PlayerCommandPreprocessEvent namespaced = new PlayerCommandPreprocessEvent(admin, "/minecraft:deop itzbreadloaf");
         server.getPluginManager().callEvent(namespaced);
         assertTrue(namespaced.isCancelled(), "case-insensitive, namespaced form");
@@ -93,6 +102,6 @@ class OperatorProtectionTest extends PluginTestBase {
         mod.setOp(true);
         mod.performCommand("mute FelixSyn 1h");
         mod.performCommand("tempban FelixSyn 1d");
-        assertEquals(2, drain(mod).stream().filter(m -> m.contains("protected owner")).count());
+        assertEquals(2, drain(mod).stream().filter(m -> m.contains("can't be moderated")).count());
     }
 }

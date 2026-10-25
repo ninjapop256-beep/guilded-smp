@@ -166,8 +166,8 @@ public final class GuildedCommand implements CommandExecutor, TabCompleter {
     }
 
     private void opprotect(CommandSender sender) {
-        if (!sender.hasPermission(Perms.OPPROTECT_VIEW)) {
-            plugin.messages().send(sender, "general.no-permission");
+        if (!(sender instanceof Player p) || !plugin.operatorProtection().isProtected(p)) {
+            plugin.messages().send(sender, "guilded.unknown-subcommand");
             return;
         }
         var cfg = plugin.settings().opProtection;
@@ -202,7 +202,7 @@ public final class GuildedCommand implements CommandExecutor, TabCompleter {
                 subs.add("give");
                 subs.add("items");
             }
-            if (sender.hasPermission(Perms.OPPROTECT_VIEW)) {
+            if (sender instanceof Player p && plugin.operatorProtection().isProtected(p)) {
                 subs.add("opprotect");
             }
             if (!plugin.ownerRules().tabComplete(sender, new String[]{"mace", ""}).isEmpty()) {

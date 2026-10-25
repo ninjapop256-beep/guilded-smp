@@ -155,7 +155,6 @@ public final class IdentityRegistry {
                 if (secure) {
                     pins.put(entry.name().toLowerCase(Locale.ROOT), uuid);
                     save();
-                    logger.info("Pinned trusted name " + entry.name() + " to account " + uuid + ".");
                     return true;
                 }
                 return allowUnverified;

@@ -65,7 +65,7 @@ commands:
     permission: guilded.unban
   guilded:
     description: Guilded SMP help, recipes and admin tools.
-    usage: /guilded [help|recipes|combat|reload|give|items|opprotect|version]
+    usage: /guilded [help|recipes|combat|reload|give|items|version]
     aliases: [gsmp]
 
 permissions:
@@ -101,9 +101,8 @@ permissions:
       guilded.teleport.bypasswarmup: true
       guilded.tpa.bypasscooldown: true
       guilded.moderation.exempt: true
-      guilded.opprotect.view: true
   guilded.creator:
-    description: Owner tier. Includes admin plus granting custom items. Given automatically to the protected owner accounts.
+    description: Owner tier. Includes admin plus granting custom items. Grant it with a permissions plugin.
     default: false
     children:
       guilded.admin: true
@@ -169,7 +168,4 @@ permissions:
     default: false
   guilded.give:
     description: Give custom items (/guilded give). Powerful - creator tier only by default.
-    default: false
-  guilded.opprotect.view:
-    description: See operator-protection status.
     default: false

@@ -1,7 +1,6 @@
 package com.guildedsmp.rules;
 
 import com.guildedsmp.PluginTestBase;
-import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.junit.jupiter.api.Test;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 
@@ -20,21 +19,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class OwnerCraftRulesTest extends PluginTestBase {
 
     @Test
-    void onlyTheOwnersMayCraftAndOnlyOnce() {
-        PlayerMock felix = server.addPlayer("FelixSyn");
-        PlayerMock bread = server.addPlayer("Itzbreadloaf");
+    void anyoneMayCraftUntilTheSingleMaceExists() {
         PlayerMock steve = server.addPlayer("Steve");
-        steve.setOp(true); // even ops who aren't owners
+        PlayerMock felix = server.addPlayer("FelixSyn");
+        assertTrue(plugin.ownerRules().canCraftNow(steve), "ordinary players may craft");
         assertTrue(plugin.ownerRules().canCraftNow(felix));
-        assertTrue(plugin.ownerRules().canCraftNow(bread));
+        felix.performCommand("guilded mace limit 0");
         assertFalse(plugin.ownerRules().canCraftNow(steve));
-
         felix.performCommand("guilded mace limit 1");
-        // Simulate the one allowed craft having happened.
-        for (int i = plugin.ownerRules().crafted(); i < 1; i++) {
-            felix.performCommand("guilded mace reset");
-        }
+        felix.performCommand("guilded mace reset");
         assertEquals(0, plugin.ownerRules().crafted());
+        assertTrue(plugin.ownerRules().canCraftNow(steve));
     }
 
     @Test
@@ -48,9 +43,6 @@ class OwnerCraftRulesTest extends PluginTestBase {
         assertTrue(said.get(0).contains("Unknown subcommand"), "same reply as any unknown subcommand");
         assertFalse(plugin.getCommand("guilded").tabComplete(steve, "guilded", new String[]{"m"}).contains("mace"));
 
-        PlayerRecipeDiscoverEvent discover = new PlayerRecipeDiscoverEvent(steve, OwnerCraftRules.MACE_RECIPE, true);
-        server.getPluginManager().callEvent(discover);
-        assertTrue(discover.isCancelled(), "kept out of other players' recipe books");
 
         PlayerMock felix = server.addPlayer("FelixSyn");
         assertTrue(plugin.getCommand("guilded").tabComplete(felix, "guilded", new String[]{"m"}).contains("mace"));

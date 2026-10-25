@@ -18,8 +18,6 @@ import org.bukkit.event.block.CrafterCraftEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
@@ -29,12 +27,9 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Mace crafting rule (owner-only, intentionally undocumented in player-facing text):
- * only the owner accounts may craft a mace, and only a fixed number may ever be crafted.
- * <p>
- * Everyone else sees nothing: the crafting result simply stays empty, no message is sent, the
- * mace recipe is kept out of their recipe book, there is no permission node, and no console log.
- * Crafters (auto-crafters) can never make a mace.
+ * Mace limit: anyone may craft a mace, but only one can ever be crafted on the server
+ * (configurable by the owners with /guilded mace). After that the crafting result just stays
+ * empty. Crafters can never make one, and shift-click can't make several at once.
  */
 public final class OwnerCraftRules implements Listener {
 
@@ -91,12 +86,13 @@ public final class OwnerCraftRules implements Listener {
         store.saveAsync(yaml);
     }
 
-    public boolean isAllowed(Player p) {
+    /** The owner accounts, who may use the hidden /guilded mace command. */
+    public boolean isOwner(Player p) {
         return plugin.identities().matches(p, allowed, plugin.settings().opProtection.allowOfflineMode());
     }
 
     public boolean canCraftNow(Player p) {
-        return isAllowed(p) && crafted < limit;
+        return crafted < limit; // anyone may craft, but only the first `limit` maces ever
     }
 
     int crafted() {
@@ -156,24 +152,9 @@ public final class OwnerCraftRules implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onDiscover(PlayerRecipeDiscoverEvent event) {
-        if (MACE_RECIPE.equals(event.getRecipe()) && !isAllowed(event.getPlayer())) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onJoin(PlayerJoinEvent event) {
-        Player p = event.getPlayer();
-        if (!isAllowed(p) && p.hasDiscoveredRecipe(MACE_RECIPE)) {
-            p.undiscoverRecipe(MACE_RECIPE);
-        }
-    }
-
     /** Owner-only "/guilded mace ..." handling. Returns false for anyone else (treated as unknown). */
     public boolean handleCommand(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player p) || !isAllowed(p)) {
+        if (!(sender instanceof Player p) || !isOwner(p)) {
             return false;
         }
         String sub = args.length > 1 ? args[1].toLowerCase(Locale.ROOT) : "status";
@@ -213,7 +194,7 @@ public final class OwnerCraftRules implements Listener {
     }
 
     public List<String> tabComplete(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player p) || !isAllowed(p)) {
+        if (!(sender instanceof Player p) || !isOwner(p)) {
             return List.of();
         }
         if (args.length == 2) {

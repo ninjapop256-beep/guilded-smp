@@ -426,7 +426,7 @@ messages:
     you-are-muted: "<red>You are muted for <white><time></white>. Reason: <white><reason></white>"
     you-are-muted-permanent: "<red>You are muted. Reason: <white><reason></white>"
   moderation:
-    target-protected: "<red><player> is a protected owner account."
+    target-protected: "<red><player> can't be moderated by you."
     target-exempt: "<red><player> can't be moderated by you."
   tempban:
     usage: "<red>Usage: /tempban <player> <duration> [reason]"

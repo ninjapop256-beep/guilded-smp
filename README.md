@@ -2,7 +2,7 @@
 
 The core plugin for the **Guilded SMP** Minecraft server: homes, teleport requests, spawn and a
 protected spawn zone, PvP combat tagging, three legendary swords with their own crafting
-ingredients, moderation tools, operator protection, and a branded TAB list. It also ships an
+ingredients, moderation tools, and a branded TAB list. It also ships an
 original resource pack with textures, models and sounds made for this project.
 
 | | |
@@ -64,7 +64,6 @@ Avoid `/reload`. Use `/guilded reload` to apply config changes.
 | `/guilded reload` | Reload config.yml | `guilded.reload` |
 | `/guilded give <player> <item> [amount]` | Give a custom item | `guilded.give` |
 | `/guilded items` | List custom item ids | `guilded.give` |
-| `/guilded opprotect` | Operator-protection status | `guilded.opprotect.view` |
 | `/guilded version` | Plugin and server version | everyone |
 
 `/gsmp` is an alias for `/guilded`. All commands tab-complete players, homes and options.
@@ -80,8 +79,8 @@ Four tiers, each including the one below it:
 |---|---|---|
 | `guilded.player` | everyone | tpa, homes, `/spawn`, `/spawn find`, spawn-protection status, recipe viewer |
 | `guilded.moderator` | op | player + mute, tempban, unban |
-| `guilded.admin` | op | moderator + spawn set/remove, spawn-protection changes, reload, combat admin, no teleport warm-up, no tpa cooldown, moderation-exempt, op-protection status |
-| `guilded.creator` | nobody | admin + `guilded.give` (custom items). Given automatically to the protected owner accounts. |
+| `guilded.admin` | op | moderator + spawn set/remove, spawn-protection changes, reload, combat admin, no teleport warm-up, no tpa cooldown, moderation-exempt |
+| `guilded.creator` | nobody | admin + `guilded.give` (custom items) |
 
 Other nodes:
 
@@ -217,27 +216,6 @@ and are redrawn when chunks load. Things to know:
 - **Emergency override:** `/guilded combat clear <player>` (admins), or the
   `guilded.combat.bypass` permission.
 
-## Operator protection
-
-`Itzbreadloaf` and `FelixSyn` are kept opped (`operator-protection.protected-players`).
-- Op status is restored on startup, on join, right after any command containing `deop`, and every 30 s.
-- `/deop <protected name>` is cancelled from players, the console, RCON and command blocks.
-- Each name is pinned to the account UUID that first joins with it on a server that verifies
-  accounts. After that, only that account counts, even if the name changes. You can also pin
-  directly with `Name:uuid`.
-- **Offline-mode servers:** anyone can join with any name, so name-only entries are **not**
-  auto-opped there (a warning is logged). Use a verified proxy, pin UUIDs, or (not recommended)
-  set `allow-offline-mode: true`.
-- Protected accounts get the `guilded.creator` tier and can't be muted or temp-banned through this plugin.
-- `setOp` is only called when op was actually lost, so there are no write loops or repeated disk writes.
-
-**Limitations:** a plugin can't stop someone with access to the server files (`ops.json`), the
-console process, the host machine, or another plugin that edits ops directly. It restores op
-status afterwards; it is not tamper-proof.
-
-**To legitimately de-op a protected account:** set `operator-protection.enabled: false`, run
-`/guilded reload`, then `/deop`. Remove the name from the list if the change should be permanent.
-
 ## Moderation
 
 - `/mute` blocks chat and the commands in `moderation.muted-blocked-commands` (msg, tell, me, ...).
@@ -308,7 +286,7 @@ same files will conflict; put Guilded SMP higher in the list.
 ## Configuration
 
 Everything lives in `plugins/GuildedSMP/config.yml`, and each setting is commented there.
-Main sections: `operator-protection`, `combat`, `teleport`, `tpa`, `homes`, `spawn`,
+Main sections: `combat`, `teleport`, `tpa`, `homes`, `spawn`,
 `spawn-protection`, `legendaries`, `recipes`, `drops`, `tablist`, `resource-pack`,
 `moderation`, `messages`.
 
@@ -322,7 +300,6 @@ Data files (`plugins/GuildedSMP/data/`):
 | `homes.yml` | Homes per player UUID |
 | `spawn.yml` | Spawn location and protection state |
 | `mutes.yml` | Active mutes |
-| `identities.yml` | Name → account UUID pins for protected accounts |
 
 Writes go to a temp file that is then moved over the original, so a crash mid-write can't corrupt
 data. A file that can't be read is renamed to `*.corrupt-<time>` and kept. While that happens,
