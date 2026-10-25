@@ -266,6 +266,8 @@ list alone and logs a warning (`tablist.disable-on-conflict`).
 `GuildedSMP-ResourcePack-1.0.0.zip` contains original textures (3 swords, 6 ingredients, three of
 them animated), models, 5 sounds and a pack icon, all made for this project.
 
+![Original Guilded SMP item textures](docs/assets-preview.png)
+
 How it works: each custom item carries a `custom_model_data` string such as
 `guildedsmp:inferno_blade`. The pack overrides the vanilla item definition of the base item
 (`assets/minecraft/items/netherite_sword.json` etc.) to pick the custom model for that string,
